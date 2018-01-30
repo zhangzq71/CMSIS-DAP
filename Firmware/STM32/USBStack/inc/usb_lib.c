@@ -15,7 +15,7 @@
  */
 #include <RTL.h>
 #include <rl_usb.h>
-#include <..\..\RL\USB\INC\usb.h>
+#include <usb.h>
 
 #pragma thumb
 #pragma O3
@@ -1198,7 +1198,7 @@ void USBD_RTX_TaskInit (void) {
 /*------------------------------------------------------------------------------
  *      USB Device Descriptors
  *----------------------------------------------------------------------------*/
-#define USBD_CDC_ACM_DESC_LEN             (USB_INTERFACE_DESC_SIZE + /*USBD_MULTI_IF * USB_INTERFACE_ASSOC_DESC_SIZE +*/ 0x0013                     + \
+#define USBD_CDC_ACM_DESC_LEN             (USB_INTERFACE_DESC_SIZE + USBD_MULTI_IF * USB_INTERFACE_ASSOC_DESC_SIZE + 0x0013                     + \
                                            USB_ENDPOINT_DESC_SIZE + USB_INTERFACE_DESC_SIZE + 2*USB_ENDPOINT_DESC_SIZE)
 #define USBD_HID_DESC_LEN                 (USB_INTERFACE_DESC_SIZE + USB_HID_DESC_SIZE                                                          + \
                                           (USB_ENDPOINT_DESC_SIZE*(1+(USBD_HID_EP_INTOUT != 0))))
@@ -1270,14 +1270,14 @@ const U8 USBD_DeviceDescriptor[] = {
   USB_DEVICE_DESC_SIZE,                 /* bLength */
   USB_DEVICE_DESCRIPTOR_TYPE,           /* bDescriptorType */
 #if ((USBD_HS_ENABLE) || (USBD_MULTI_IF))
-  WBVAL(0x0110), /* 2.00 */             /* bcdUSB */
+  WBVAL(0x0200), /* 2.00 */             /* bcdUSB */
 #else
   WBVAL(0x0110), /* 1.10 */             /* bcdUSB */
 #endif
 #if (USBD_MULTI_IF)
-  0x02,       /* bDeviceClass */
-  0x00,                                 /* bDeviceSubClass */
-  0x00,                                 /* bDeviceProtocol */
+  USB_DEVICE_CLASS_MISCELLANEOUS,       /* bDeviceClass */
+  0x02,                                 /* bDeviceSubClass */
+  0x01,                                 /* bDeviceProtocol */
 #elif (USBD_CDC_ACM_ENABLE)
   USB_DEVICE_CLASS_COMMUNICATIONS,      /* bDeviceClass CDC*/
   0x00,                                 /* bDeviceSubClass */
@@ -1741,7 +1741,7 @@ const U8 USBD_ConfigDescriptor[] = {
 
 #if (USBD_CDC_ACM_ENABLE)
 #if (USBD_MULTI_IF)
-  //CDC_ACM_DESC_IAD(USBD_CDC_ACM_CIF_NUM,2)
+  CDC_ACM_DESC_IAD(USBD_CDC_ACM_CIF_NUM,2)
 #endif
   CDC_ACM_DESC_IF0
   CDC_ACM_EP_IF0
